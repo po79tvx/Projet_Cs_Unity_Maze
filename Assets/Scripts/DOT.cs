@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 /// <summary>
@@ -10,25 +9,33 @@ public class DOT : MonoBehaviour
     // Vectors
     public Vector2 pos;// Position
 
-    [Range(0, 40)]
     public Vector2 vel;// Velocity
+
     public Vector2 acc;// Acceleration
 
-    public GameObject Ball;
-    public GameObject ballContainer;
-    public DOT newScript;
+    //public GameObject ball;
+    public GameObject ballObject;
+
+    private GameObject ballClone;
+
+    //private GameObject ballContainer;
+    private DOT newScript;
 
     private DNA _brain;
-    public DNA Brain { get { return _brain; } set { _brain = value; } }
 
-    bool hitWall = false;
+    public DNA Brain
+    { get { return _brain; } set { _brain = value; } }
 
-    bool isDead = false;
-    bool isOnGoal = false;
+    private bool hitWall = false;
 
-    bool isBest = false;
+    private bool isDead = false;
+    private bool isOnGoal = false;
+
+    private bool isBest = false;
 
     public float Fitness = 0.0f;
+
+    public GameObject Ball;
 
     /// <summary>
     /// Create a DOT with a Brain
@@ -38,36 +45,44 @@ public class DOT : MonoBehaviour
         Brain = brain;
         brain.fitnessFunction = CalculateFitness;
 
-        pos = new Vector2(808, -324);
-        vel = new Vector2(0, 0);
-        acc = new Vector2(0, 0);
+        pos = new Vector2(-811f, 413f);
+
+        vel = new Vector2(1f, 1f);
+        acc = new Vector2(1f, 1f);
 
         Debug.Log("New DOT => DOT");
     }
 
     public void MoveDot()
     {
-        if (Brain.directions.Length > Brain.step)
-        {
-            acc = Brain.directions[Brain.step];
-            Brain.step++;
-        }
-        else
-        {
-            isDead = true;
-            CalculateFitness();
-        }
+        /*if (Brain.Genes.Length > Brain.step)
+         {
+             acc = Brain.Genes[Brain.step];
+             Brain.step++;
+         }
+         else
+         {
+             isDead = true;
+             CalculateFitness();
+         }*/
 
         /* Add the acceleration to velocity*/
         vel += acc;
 
+        //Debug.Log($"Velocity : ({vel}) => Dot");
+
         /* Update the position of the dot. */
         pos += vel;
+
+        //Debug.Log($"Position : ({pos}) => Dot");
+
+        this.transform.position = pos;
     }
 
     /* Moves the dot and checks if the dot has hit a wall etc. If so, it is killed.
      Also checks to see if it has reached the goal. */
-    void Update()
+
+    private void Update()
     {
         /* Only update if the dot is still moving. */
         if (!isDead && !isOnGoal && !hitWall)
@@ -78,20 +93,18 @@ public class DOT : MonoBehaviour
                 CalculateFitness();
             }
             /* This checks to see if the dot has reached the goal. */
-            else if (Vector3.Distance(this.pos, GameObject.Find("Goal").transform.position) < 5)
+            else if (Vector2.Distance(this.pos, GameObject.Find("Goal").transform.position) < 5)
             {
                 isOnGoal = true;
                 CalculateFitness();
             }
         }
 
-        Debug.Log("Calculate Fitness => DNA");
-
+        // Debug.Log("Calculate Fitness => DNA");
     }
 
-
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="collision"></param>
     private void OnTriggerEnter2D(Collider2D collision)
@@ -100,25 +113,33 @@ public class DOT : MonoBehaviour
             hitWall = false;
         else
             hitWall = true;
-
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="i"></param>
     /// <param name="newDot"></param>
     /// <returns></returns>
-    public GameObject CreateNewBall(int i)
+    public GameObject CreateNewBall(int i, GameObject ball)
     {
-        GameObject ballClone = Instantiate(Ball);
-        ballClone.transform.parent = ballContainer.transform;
-        ballClone.name = "BallClone" + (i);
-        ballClone.AddComponent<DOT>();
+        ballClone = ball;
+        try
+        {
+            //ballClone.transform.parent = ballContainer.transform;
+            ballClone.name = "BallClone" + (i);
+            //ballClone.AddComponent<DOT>();
 
-        Debug.Log($"Create New Ball ({i}) => DOT");
+            Debug.Log($"Create New Ball ({i}) => DOT");
 
-        return ballClone;
+            return ballClone;
+        }
+        catch (System.NullReferenceException)
+        {
+            Debug.Log($"Create New Ball ({i}) [Error] => DOT");
+
+            return null;
+        }
     }
 
     /// <summary>
@@ -132,6 +153,7 @@ public class DOT : MonoBehaviour
 
     /* This is the fitness function for this algorithm. It uses the distance to the goal,
      along with the speed at which it reached the goal. */
+
     public float CalculateFitness()
     {
         if (Fitness == 0)
@@ -141,7 +163,7 @@ public class DOT : MonoBehaviour
             /* If the dot has just run out of steps to make, or it has actually reached the goal then calculate the fitness. */
             if (isDead || isOnGoal)
             {
-                Fitness = 1.0f / (distanceToGoal * distanceToGoal + (int)Math.Pow(Brain.step, 2));
+                Fitness = 1.0f / (distanceToGoal * distanceToGoal + (int)Mathf.Pow(Brain.step, 2));
             }
             /* If the dot has hit a wall or obstacle, then its fitness is calculated as a number
                effectively 0 in size. I can't remember why I didn't use fitness = 0, but there was

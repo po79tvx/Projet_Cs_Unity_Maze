@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class Move : MonoBehaviour
 {
@@ -8,7 +7,7 @@ public class Move : MonoBehaviour
     private float moveHorizontal;
     private float moveVertical;
 
-    void Start()
+    private void Start()
     {
         rb = gameObject.GetComponent<Rigidbody2D>();
 
@@ -19,13 +18,12 @@ public class Move : MonoBehaviour
     {
         moveHorizontal = Input.GetAxisRaw("Horizontal");
         moveVertical = Input.GetAxisRaw("Vertical");
-
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        if(moveHorizontal > 0.1f || moveHorizontal < -0.1f)
+        if (moveHorizontal > 0.1f || moveHorizontal < -0.1f)
             rb.AddForce(new Vector2(moveHorizontal * movementSpeed, 0f), ForceMode2D.Impulse);
 
         if (moveVertical > 0.1f || moveVertical < -0.1f)

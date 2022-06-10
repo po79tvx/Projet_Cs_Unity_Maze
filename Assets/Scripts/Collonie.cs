@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Collonie : MonoBehaviour
@@ -15,7 +13,7 @@ public class Collonie : MonoBehaviour
 
     public Collonie(int numberOfDot)
     {
-        DotCollonie = new GameObject[numberOfDot];
+        /*DotCollonie = new GameObject[numberOfDot];
 
         for (int i = 0; i < numberOfDot; i++)
         {
@@ -23,6 +21,6 @@ public class Collonie : MonoBehaviour
             DotCollonie[i] = tmpDot.CreateNewBall(i);
         }
 
-        Debug.Log("New Collonie => Collonie");
+        Debug.Log("New Collonie => Collonie");*/
     }
 }

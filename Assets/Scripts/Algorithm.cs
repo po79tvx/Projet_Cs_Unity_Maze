@@ -6,6 +6,7 @@ public class Algorithm
 {
     // Attributs
     public List<GameObject> Population { get; private set; }// List of population
+
     public int Generation { get; private set; }// How many generations has past
     public float BestFitness { get; private set; }// Fitness of the best individu
     public Vector2[] BestGenes { get; private set; }// Best genes
@@ -19,6 +20,7 @@ public class Algorithm
     private int dotSize;// Size of DOT
     private Func<Vector2> getRandomGene;// Function to get a random gene
     private Func<float> fitnessFunction;// Function to get the fitness
+    public GameObject Ball;
 
     /// <summary>
     /// Create a new Genetic Algorithm
@@ -31,7 +33,7 @@ public class Algorithm
     /// <param name="elitism">How many elements will be kept</param>
     /// <param name="mutationRate">Initial mutation rate</param>
     public Algorithm(int populationSize, int dotSize, System.Random random, Func<Vector2> getRandomGene, Func<float> fitnessFunction,
-        int elitism, float mutationRate = 0.01f)
+        int elitism, float mutationRate, GameObject ball)
     {
         Generation = 1;// First generation
         Elitism = elitism;
@@ -39,6 +41,7 @@ public class Algorithm
         Population = new List<GameObject>(populationSize);// New population
         newPopulation = new List<GameObject>(populationSize);// List of population in the algorithm
 
+        this.Ball = ball;
         this.random = random;
         this.dotSize = dotSize;
         this.getRandomGene = getRandomGene;
@@ -46,24 +49,29 @@ public class Algorithm
 
         BestGenes = new Vector2[dotSize];
 
-        for (int i = 0; i < populationSize; i++)
+        for (int i = 1; i < populationSize + 1; i++)
         {
             Debug.Log("Create new ball => Algorithm (Constructor)");
 
             DOT tmpDot = new(new(dotSize, random, getRandomGene, fitnessFunction, shouldInitGenes: true));
-            newPopulation.Add(tmpDot.CreateNewBall(i));
+            newPopulation.Add(tmpDot.CreateNewBall(i, ball));
         }
 
         Debug.Log("New Algorithm => Algorithm (Constructor)");
-    }
+        Debug.Log($"Pop size : ({newPopulation.Count}) = Algorithm (Constructor)");
 
+        foreach (GameObject genDot in newPopulation)
+        {
+            Debug.Log($"Pop name : {genDot.name}");
+        }
+    }
 
     /// <summary>
     /// Calculate the fitness
     /// </summary>
     private void CalculateFitness()
     {
-        Debug.Log("Calculate Fitness => Algorithm");
+        // Debug.Log("Calculate Fitness => Algorithm");
 
         fitnessSum = 0;
         DNA best = Population[0].GetComponent<DOT>().Brain;
@@ -78,7 +86,6 @@ public class Algorithm
             }
         }
     }
-
 
     /// <summary>
     /// Create a new generation
@@ -105,7 +112,6 @@ public class Algorithm
             Debug.Log($"Population ({Population.Count.ToString()}) => Algorithm");
             CalculateFitness();
             Population.Sort();
-
         }
         newPopulation.Clear();// Clear the old list
 
@@ -136,7 +142,7 @@ public class Algorithm
                 DOT newChild = new(child);
 
                 // Add the child to the population
-                newPopulation.Add(newChild.CreateNewBall(i));
+                newPopulation.Add(newChild.CreateNewBall(i, Ball));
             }
             else
             {
@@ -145,8 +151,8 @@ public class Algorithm
                 Debug.Log("Create New Ball => Algoritm");
 
                 DOT tmpDot = new(new(dotSize, random, getRandomGene, fitnessFunction, shouldInitGenes: true));
-                newPopulation.Add(tmpDot.CreateNewBall(i));
-
+                GameObject tmpObject = tmpDot.CreateNewBall(i, Ball);
+                newPopulation.Add(tmpObject);
             }
         }
 
@@ -177,7 +183,6 @@ public class Algorithm
         Debug.Log("Choose Parent => Algorithm");
 
         return null;
-
     }
 
     private int CompareDNA(DNA a, DNA b)
@@ -195,5 +200,4 @@ public class Algorithm
             return 0;
         }
     }
-
 }
