@@ -10,7 +10,7 @@ public class DNA : MonoBehaviour
     // Attributs
     public Vector2[] Genes { get; private set; }// Array of genes
 
-    public float Fitness { get; private set; }// Calculation time of the evaluation function
+    public float Fitness { get; set; }// Calculation time of the evaluation function
 
     private System.Random random;// Random
     public Func<Vector2> getRandomGene;// Random gene
@@ -31,7 +31,7 @@ public class DNA : MonoBehaviour
             // Create a new random gene for each gene of the dna
             for (int i = 0; i < Genes.Length; i++)
             {
-                Genes[i] = this.getRandomGene();
+                Genes[i] = getRandomGene();
             }
         }
 
@@ -40,9 +40,7 @@ public class DNA : MonoBehaviour
 
     private void Start()
     {
-        for (int i = 0; i < Genes.Length; i++)
-        {
-        }
+        Randomize();
     }
 
     /// <summary>
@@ -50,22 +48,26 @@ public class DNA : MonoBehaviour
     /// </summary>
     /// <param name="otherParent">The second parent</param>
     /// <returns>Return the child</returns>
-    public DNA Crossover(DNA otherParent)
+    /*public DNA Crossover(DNA otherParent)
     {
         // Create a new dna (Child of the two parents)
-        DNA child = new(Genes.Length, random, getRandomGene, fitnessFunction, shouldInitGenes: false);
+        DNA child = new(Genes.Length, random, getRandomGene, fitnessFunction, shouldInitGenes: true);
 
         // Reach the genes of the child
         for (int i = 0; i < Genes.Length; i++)
         {
             // Have a chance to replace them with genes of first or second parent
-            child.Genes[i] = random.NextDouble() < 0.5 ? Genes[i] : otherParent.Genes[i];
+            if (random.NextDouble() < 0.5)
+                child.Genes[i] = Genes[i];
+            else
+                child.Genes[i] = otherParent.Genes[i];
         }
 
         Debug.Log("Crossover => DNA");
 
         return child;
-    }
+    }*/
+
 
     /// <summary>
     /// Has a chance to mutate the dna
@@ -84,5 +86,19 @@ public class DNA : MonoBehaviour
         }
 
         Debug.Log("Mutate => DNA");
+    }
+
+
+    /* Generates random vectors for the directions array.These are unit vectors(mag.
+     of 1) with a random angle. */
+    private void Randomize(){
+        for (int i = 0; i < Genes.Length; i++)
+        {
+            float randomX = (float)random.NextDouble() * 365;
+            float randomY = (float)random.NextDouble() * 365;
+
+            //float randomAngle = random.Next(2 * MathF.PI);
+            Genes[i] = new Vector2(randomX, randomY);
+        }
     }
 }

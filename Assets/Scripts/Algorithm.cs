@@ -21,6 +21,9 @@ public class Algorithm
     private Func<Vector2> getRandomGene;// Function to get a random gene
     private Func<float> fitnessFunction;// Function to get the fitness
     public GameObject Ball;
+    public Collonie tmpCollonie;
+    private DOT tmpDot;
+    private GameObject tmpBall;
 
     /// <summary>
     /// Create a new Genetic Algorithm
@@ -41,7 +44,7 @@ public class Algorithm
         Population = new List<GameObject>(populationSize);// New population
         newPopulation = new List<GameObject>(populationSize);// List of population in the algorithm
 
-        this.Ball = ball;
+        Ball = ball;
         this.random = random;
         this.dotSize = dotSize;
         this.getRandomGene = getRandomGene;
@@ -49,27 +52,28 @@ public class Algorithm
 
         BestGenes = new Vector2[dotSize];
 
-        for (int i = 1; i < populationSize + 1; i++)
-        {
-            Debug.Log("Create new ball => Algorithm (Constructor)");
+        for (int i = 0; i < populationSize; i++)
+        { 
+            tmpDot = new(new(dotSize, random, getRandomGene, fitnessFunction, shouldInitGenes: true));
 
-            DOT tmpDot = new(new(dotSize, random, getRandomGene, fitnessFunction, shouldInitGenes: true));
-            newPopulation.Add(tmpDot.CreateNewBall(i, ball));
+            tmpBall = tmpDot.CreateNewBall(i, ball);
+
+            DOT tmpTest = (DOT)tmpBall.AddComponent(typeof(DOT));
+
+            tmpTest.DotInteractConstructor(tmpDot.Brain);
+
+            newPopulation.Add(tmpBall);
         }
 
-        Debug.Log("New Algorithm => Algorithm (Constructor)");
         Debug.Log($"Pop size : ({newPopulation.Count}) = Algorithm (Constructor)");
 
-        foreach (GameObject genDot in newPopulation)
-        {
-            Debug.Log($"Pop name : {genDot.name}");
-        }
+        Debug.Log("New Algorithm => Algorithm (Constructor)");
     }
 
     /// <summary>
     /// Calculate the fitness
     /// </summary>
-    private void CalculateFitness()
+    private void CalculatePopulationFitness()
     {
         // Debug.Log("Calculate Fitness => Algorithm");
 
@@ -110,8 +114,8 @@ public class Algorithm
         if (Population.Count > 0)
         {
             Debug.Log($"Population ({Population.Count.ToString()}) => Algorithm");
-            CalculateFitness();
-            Population.Sort();
+            CalculatePopulationFitness();
+            //Population.Sort();
         }
         newPopulation.Clear();// Clear the old list
 
@@ -134,7 +138,7 @@ public class Algorithm
                 DOT parent2 = ChooseParent();
 
                 // New child
-                DNA child = parent1.Brain.Crossover(parent2.Brain);
+                DNA child = Crossover(parent1.Brain, parent2.Brain);
 
                 // Mutate the child according to the mutation rate
                 child.Mutate(MutationRate);
@@ -166,18 +170,43 @@ public class Algorithm
         Debug.Log("New Generation => Algorithm");
     }
 
+    /// <summary>
+    /// Crosses DNA from both parents
+    /// </summary>
+    /// <param name="otherParent">The second parent</param>
+    /// <returns>Return the child</returns>
+    public DNA Crossover(DNA firstParent, DNA secondParent)
+    {
+        // Create a new dna (Child of the two parents)
+        DNA child = new(firstParent.Genes.Length, random, getRandomGene, fitnessFunction, shouldInitGenes: true);
+
+        // Reach the genes of the child
+        for (int i = 0; i < firstParent.Genes.Length; i++)
+        {
+            // Have a chance to replace them with genes of first or second parent
+            if (random.NextDouble() < 0.5)
+                child.Genes[i] = firstParent.Genes[i];
+            else
+                child.Genes[i] = secondParent.Genes[i];
+        }
+
+        Debug.Log("Crossover => DNA");
+
+        return child;
+    }
+
     private DOT ChooseParent()
     {
         double randomNumber = random.NextDouble() * fitnessSum;
 
         for (int i = 0; i < Population.Count; i++)
         {
-            if (randomNumber < Population[i].GetComponent<DOT>().Fitness)
+            if (randomNumber < Population[i].GetComponent<DOT>().Brain.Fitness)
             {
                 return Population[i].GetComponent<DOT>();
             }
 
-            randomNumber -= Population[i].GetComponent<DOT>().Fitness;
+            randomNumber -= Population[i].GetComponent<DOT>().Brain.Fitness;
         }
 
         Debug.Log("Choose Parent => Algorithm");
