@@ -4,7 +4,7 @@ using UnityEngine;
 public class GeneratePop : MonoBehaviour
 {
     [Header("Genetic Algorithm")]
-    [SerializeField] private int PopulationSize = 200;
+    [SerializeField] private int PopulationSize = 3;
 
     [SerializeField] private float MutationRate = 0.01f;
     [SerializeField] private int elitism = 5;
@@ -33,8 +33,8 @@ public class GeneratePop : MonoBehaviour
 
     private Vector2 GetRandomGene()
     {
-        float randomX = (float)random.NextDouble() * 365;
-        float randomY = (float)random.NextDouble() * 365;
+        float randomX = (float)random.NextDouble() * random.Next(-365,365);
+        float randomY = (float)random.NextDouble() * random.Next(-365,365);
 
         //float randomAngle = random.Next(2 * MathF.PI);
         Vector2 randomAngle = new (randomX, randomY);

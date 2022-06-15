@@ -57,6 +57,7 @@ public class DOT : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        rb.bodyType = RigidbodyType2D.Kinematic;
     }
 
     public void MoveDot()
@@ -71,23 +72,26 @@ public class DOT : MonoBehaviour
              isDead = true;
              CalculateFitness();
          }
-      
+
         // Add the acceleration to velocity
-        rb.velocity = acc;
+        //rb.velocity = acc;
         //rb.AddRelativeForce(acc);
+
+        //rb.angularVelocity = acc.y;
+
+        rb.velocity = new Vector2(acc.x, acc.y);
 
         //Debug.Log($"Velocity : ({vel}) => Dot");
 
         // Update the position of the dot.
         //rb.position += pos;
-        rb.AddRelativeForce(pos);
+        rb.AddRelativeForce(pos,ForceMode2D.Force);
 
         //Debug.Log($"Position : ({pos}) => Dot");
     }
 
     /* Moves the dot and checks if the dot has hit a wall etc. If so, it is killed.
      Also checks to see if it has reached the goal. */
-
     private void Update()
     {
         /* Only update if the dot is still moving. */
