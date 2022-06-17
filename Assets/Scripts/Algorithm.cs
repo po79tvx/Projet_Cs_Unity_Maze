@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class Algorithm
 {
-    // Attributs
+    /// <summary>
+    /// Attributs of the Algorithm
+    /// </summary>
+    # region Attributs
     public List<GameObject> Population { get; private set; }// List of population
 
     public int Generation { get; private set; }// How many generations has past
@@ -25,6 +28,13 @@ public class Algorithm
     private DOT tmpDot;
     private GameObject tmpBall;
 
+    public List<DOT> oldPopulation;
+    #endregion
+
+    /// <summary>
+    /// Constructor of the algorithm
+    /// </summary>
+    #region Constructor
     /// <summary>
     /// Create a new Genetic Algorithm
     /// </summary>
@@ -43,13 +53,16 @@ public class Algorithm
         MutationRate = mutationRate;
         Population = new List<GameObject>(populationSize);// New population
         newPopulation = new List<GameObject>(populationSize);// List of population in the algorithm
+        oldPopulation = new List<DOT>(populationSize);
 
+        // Passing attributs of 
         Ball = ball;
         this.random = random;
         this.dotSize = dotSize;
         this.getRandomGene = getRandomGene;
         this.fitnessFunction = fitnessFunction;
 
+        // Create a new array with the bests genes
         BestGenes = new Vector2[dotSize];
 
         for (int i = 0; i < populationSize; i++)
@@ -60,78 +73,97 @@ public class Algorithm
 
             DOT tmpTest = (DOT)tmpBall.AddComponent(typeof(DOT));
 
-            tmpTest.DotInteractConstructor(tmpDot.Brain);
+            tmpTest.DotInteractConstructor(tmpDot.Brain, this, i);
 
-            newPopulation.Add(tmpBall);
+            Population.Add(tmpBall);
+
+            oldPopulation.Add(tmpTest);
         }
 
-        Debug.Log($"Pop size : ({newPopulation.Count}) = Algorithm (Constructor)");
+        Debug.Log($"Pop size : ({Population.Count}) = Algorithm (Constructor)");
 
         Debug.Log("New Algorithm => Algorithm (Constructor)");
     }
 
+    #endregion
+
+    /// </summary>
+    /// Functions of the algorithm
+    /// </summary>
+    #region Functions
+
     /// <summary>
-    /// Calculate the fitness
+    /// Calculate the fitness of the population
     /// </summary>
     private void CalculatePopulationFitness()
     {
         // Debug.Log("Calculate Fitness => Algorithm");
 
         fitnessSum = 0;
-        DNA best = Population[0].GetComponent<DOT>().Brain;
+        DNA best = oldPopulation[0].Brain;
 
         for (int i = 0; i < Population.Count; i++)
         {
-            fitnessSum += Population[i].GetComponent<DOT>().Brain.fitnessFunction();
+            fitnessSum += oldPopulation[i].Brain.Fitness;
 
-            if (Population[i].GetComponent<DOT>().Brain.Fitness > best.Fitness)
+            //fitnessSum += Population[i].GetComponent<DOT>().CalculateFitness();
+
+            if (oldPopulation[i].Brain.Fitness > best.Fitness)
             {
-                best = Population[i].GetComponent<DOT>().Brain;
+                best = oldPopulation[i].Brain;
             }
         }
     }
 
     /// <summary>
-    /// Create a new generation
+    /// Create a new generation of dot
     /// </summary>
-    /// <param name="numNewDOT"></param>
-    /// <param name="crossoverNewDOT"></param>
+    /// <param name="numNewDOT">Number of new dot to create</param>
+    /// <param name="crossoverNewDOT">Can the dot make a crossover ?</param>
     public void NewGeneration(int numNewDOT, bool crossoverNewDOT)
     {
         int finalCount = Population.Count + numNewDOT;
+        /*
+        Debug.Log($"Old Population ({oldPopulation.Count}) => Algorithm");
 
         Debug.Log($"Start creation of new gen ({numNewDOT.ToString()}) => Algorithm");
         Debug.Log($"Final count ({finalCount.ToString()}) => Algorithm");
+        */
 
-        // Return nothing if the population is dead
-        if (finalCount <= 0)
-        {
-            Debug.Log("Final count <= 0 return; => Algorithm");
-            return;
-        }
-
-        // If the population is not totally dead
+        // If the population is totally dead
         if (Population.Count > 0)
         {
-            Debug.Log($"Population ({Population.Count.ToString()}) => Algorithm");
+            //Debug.Log($"Population ({Population.Count.ToString()}) => Algorithm");
             CalculatePopulationFitness();
             //Population.Sort();
         }
         newPopulation.Clear();// Clear the old list
 
-        Debug.Log("Clear population => Algorithm");
+        //Debug.Log("Clear population => Algorithm");
 
         // Loop inside the population size
-        for (int i = 0; i < Population.Count; i++)
+        for (int i = 0; i < oldPopulation.Count; i++)
         {
-            Debug.Log($"For loop ({i.ToString()})=> Algorithm");
+           //Debug.Log($"For loop ({i.ToString()})=> Algorithm");
 
             // How many elements we want to keep & not more elements than the original population
-            if (i < Elitism && i < Population.Count)
+            if (i < Elitism && i < oldPopulation.Count)
             {
-                newPopulation.Add(Population[i]);
+                tmpDot = oldPopulation[i];
+
+                tmpBall = tmpDot.CreateNewBall(i, Ball);
+
+                DOT tmpTest = (DOT)tmpBall.AddComponent(typeof(DOT));
+
+                tmpTest.DotInteractConstructor(tmpDot.Brain, this, i);
+
+                newPopulation.Add(tmpBall);
+
+                Debug.Log($"Elitism ({i}) => Algorithm");
+
+                //newPopulation.Add(oldPopulation[i]);
             }
-            else if (i < Population.Count || crossoverNewDOT)// Create new kids
+            else if (i < oldPopulation.Count || crossoverNewDOT)// Create new kids
             {
                 // New parents
                 DOT parent1 = ChooseParent();
@@ -142,21 +174,42 @@ public class Algorithm
 
                 // Mutate the child according to the mutation rate
                 child.Mutate(MutationRate);
-
+                
                 DOT newChild = new(child);
 
                 // Add the child to the population
-                newPopulation.Add(newChild.CreateNewBall(i, Ball));
+                /*newPopulation.Add(newChild.CreateNewBall(i, Ball));
+                */
+
+                tmpDot = newChild;
+
+                tmpBall = tmpDot.CreateNewBall(i, Ball);
+
+                DOT tmpTest = (DOT)tmpBall.AddComponent(typeof(DOT));
+
+                tmpTest.DotInteractConstructor(newChild.Brain, this, i);
+
+                newPopulation.Add(tmpBall);
+
+                Debug.Log($"Crossover ({i}) => Algorithm");
             }
             else
             {
                 // Replace the actual generation with an other generation
 
-                Debug.Log("Create New Ball => Algoritm");
+                //Debug.Log("Create New Ball => Algoritm");
 
-                DOT tmpDot = new(new(dotSize, random, getRandomGene, fitnessFunction, shouldInitGenes: true));
-                GameObject tmpObject = tmpDot.CreateNewBall(i, Ball);
-                newPopulation.Add(tmpObject);
+                tmpDot = new(new(dotSize, random, getRandomGene, fitnessFunction, shouldInitGenes: true));
+
+                tmpBall = tmpDot.CreateNewBall(i, Ball);
+
+                DOT tmpTest = (DOT)tmpBall.AddComponent(typeof(DOT));
+
+                tmpTest.DotInteractConstructor(tmpDot.Brain, this, i);
+
+                newPopulation.Add(tmpBall);
+
+                Debug.Log($"New Ball ({i} => Algorithm");
             }
         }
 
@@ -167,18 +220,23 @@ public class Algorithm
 
         Generation++;// Increase the generation counter
 
-        Debug.Log("New Generation => Algorithm");
+        /*
+        Debug.Log($"New Generation {Generation} => Algorithm");
+        Debug.Log($"Pop size : {Population.Count} => Algorithm");
+        Debug.Log($"New pop size : {newPopulation.Count} => Algorithm");
+        */
     }
 
     /// <summary>
-    /// Crosses DNA from both parents
+    /// Make a crossover between two parents
     /// </summary>
-    /// <param name="otherParent">The second parent</param>
+    /// <param name="firstParent">First parent</param>
+    /// <param name="secondParent">Second parent</param>
     /// <returns>Return the child</returns>
     public DNA Crossover(DNA firstParent, DNA secondParent)
     {
         // Create a new dna (Child of the two parents)
-        DNA child = new(firstParent.Genes.Length, random, getRandomGene, fitnessFunction, shouldInitGenes: true);
+        DNA child = new(firstParent.Genes.Length, random, getRandomGene, fitnessFunction, shouldInitGenes: false);
 
         // Reach the genes of the child
         for (int i = 0; i < firstParent.Genes.Length; i++)
@@ -190,43 +248,34 @@ public class Algorithm
                 child.Genes[i] = secondParent.Genes[i];
         }
 
-        Debug.Log("Crossover => DNA");
+        //Debug.Log("Crossover => DNA");
 
         return child;
     }
 
+    /// <summary>
+    /// Choose which parent will make a crossover
+    /// </summary>
+    /// <returns>Which parent ?</returns>
     private DOT ChooseParent()
     {
         double randomNumber = random.NextDouble() * fitnessSum;
 
-        for (int i = 0; i < Population.Count; i++)
+        // Loop into all the parents
+        for (int i = 0; i < oldPopulation.Count; i++)
         {
-            if (randomNumber < Population[i].GetComponent<DOT>().Brain.Fitness)
+            if (randomNumber < oldPopulation[i].Brain.Fitness)
             {
-                return Population[i].GetComponent<DOT>();
+                return oldPopulation[i];
             }
 
-            randomNumber -= Population[i].GetComponent<DOT>().Brain.Fitness;
+            randomNumber -= oldPopulation[i].Brain.Fitness;
         }
 
-        Debug.Log("Choose Parent => Algorithm");
+        //Debug.Log("Choose Parent => Algorithm");
 
         return null;
     }
 
-    private int CompareDNA(DNA a, DNA b)
-    {
-        if (a.Fitness > b.Fitness)
-        {
-            return -1;
-        }
-        else if (a.Fitness < b.Fitness)
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
+    #endregion
 }

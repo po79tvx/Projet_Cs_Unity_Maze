@@ -2,12 +2,14 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// A DNA of type 'T'
+/// A DNA
 /// </summary>
-/// <typeparam name="T">Any type of param</typeparam>
 public class DNA : MonoBehaviour
 {
-    // Attributs
+    /// <summary>
+    /// Attributs of the DNA 
+    /// </summary>
+    #region Attributs
     public Vector2[] Genes { get; private set; }// Array of genes
 
     public float Fitness { get; set; }// Calculation time of the evaluation function
@@ -17,7 +19,22 @@ public class DNA : MonoBehaviour
     public Func<float> fitnessFunction;// Function of the fitness
     public int step = 0;
 
-    public DNA(int size, System.Random random, Func<Vector2> getRandomGene, Func<float> fitnessFunction, bool shouldInitGenes)
+    #endregion
+
+    /// <summary>
+    /// Constructor of the DNA 
+    /// </summary>
+    #region Constructor
+
+    /// <summary>
+    /// Create a new constructor
+    /// </summary>
+    /// <param name="size">Size of the dna</param>
+    /// <param name="random">A random number</param>
+    /// <param name="getRandomGene">Function to get random genes</param>
+    /// <param name="fitnessFunction">Function to get the fitness</param>
+    /// <param name="shouldInitGenes">Can the dna init genes ?</param>
+    public DNA(int size, System.Random random, Func<Vector2> getRandomGene, Func<float> fitnessFunction, bool shouldInitGenes = false)
     {
         // Assign values to DNA
         Genes = new Vector2[size];
@@ -28,46 +45,18 @@ public class DNA : MonoBehaviour
         // Don't create genes every time, only when he his allowed to
         if (shouldInitGenes)
         {
-            // Create a new random gene for each gene of the dna
-            for (int i = 0; i < Genes.Length; i++)
-            {
-                Genes[i] = getRandomGene();
-            }
+            Randomize();
         }
 
-        Debug.Log("New DNA => DNA");
+        //Debug.Log("New DNA => DNA");
     }
 
-    private void Start()
-    {
-        Randomize();
-    }
+    #endregion
 
     /// <summary>
-    /// Crosses DNA from both parents
+    /// Function of the DNA 
     /// </summary>
-    /// <param name="otherParent">The second parent</param>
-    /// <returns>Return the child</returns>
-    /*public DNA Crossover(DNA otherParent)
-    {
-        // Create a new dna (Child of the two parents)
-        DNA child = new(Genes.Length, random, getRandomGene, fitnessFunction, shouldInitGenes: true);
-
-        // Reach the genes of the child
-        for (int i = 0; i < Genes.Length; i++)
-        {
-            // Have a chance to replace them with genes of first or second parent
-            if (random.NextDouble() < 0.5)
-                child.Genes[i] = Genes[i];
-            else
-                child.Genes[i] = otherParent.Genes[i];
-        }
-
-        Debug.Log("Crossover => DNA");
-
-        return child;
-    }*/
-
+    #region Functions
 
     /// <summary>
     /// Has a chance to mutate the dna
@@ -85,20 +74,19 @@ public class DNA : MonoBehaviour
             }
         }
 
-        Debug.Log("Mutate => DNA");
+        //Debug.Log("Mutate => DNA");
     }
 
-
-    /* Generates random vectors for the directions array.These are unit vectors(mag.
-     of 1) with a random angle. */
+    /// <summary>
+    /// /* Generates random vectors for the directions array.These are unit vectors(mag.
+    /// of 1) with a random angle. */
+    /// </summary>
     private void Randomize(){
         for (int i = 0; i < Genes.Length; i++)
         {
-            float randomX = (float)random.NextDouble() * 365;
-            float randomY = (float)random.NextDouble() * 365;
-
-            //float randomAngle = random.Next(2 * MathF.PI);
-            Genes[i] = new Vector2(randomX, randomY);
+            Genes[i] = getRandomGene();
         }
     }
+
+    #endregion
 }
