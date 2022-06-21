@@ -15,6 +15,9 @@ public class DOT : MonoBehaviour
     public Vector2 pos = new (0f, 0f);// Position
     public Vector2 acc = new (1f, 1f);// Acceleration
 
+    [Range (0,50)]
+    public Vector2 vel = new(0f, 0f);// Velocity
+
     public bool hitWall;
     private bool isOnGoal, isBest;
     public float Fitness = 0.0f;
@@ -40,6 +43,8 @@ public class DOT : MonoBehaviour
         pos = new Vector2(0f, 0f);
 
         acc = new Vector2(1f, 1f);
+
+        vel = new Vector2(0f, 0f);
 
         //Debug.Log("New DOT => DOT");
     }
@@ -88,6 +93,8 @@ public class DOT : MonoBehaviour
          }
 
         // Add the acceleration to velocity
+        //vel -= new Vector2(acc.x, acc.y) * Time.deltaTime;
+
         rb.velocity -= new Vector2(acc.x, acc.y) * Time.deltaTime;
 
         // Update the position of the dot.
@@ -160,6 +167,8 @@ public class DOT : MonoBehaviour
         {
             hitWall = true;
             CalculateFitness();
+            //Brain.Genes[Brain.step] = Brain.getRandomGene();
+
             //Debug.Log($"Fitness de ({index}) == ({Brain.Fitness}) => DOT");
         }
     }
@@ -174,11 +183,13 @@ public class DOT : MonoBehaviour
     {
         try
         {
-            GameObject tmpBall = GameObject.Instantiate(ball);
+            GameObject maze = GameObject.Find("Maze/IA");
+
+            Vector2 ballLocation = new(maze.transform.position.x + -806, maze.transform.position.y + 328);
+
+            GameObject tmpBall = Instantiate(ball,ballLocation, Quaternion.identity,maze.transform);
             
             tmpBall.name = "BallClone" + (i + 1);
-
-            tmpBall.transform.SetParent(GameObject.Find("Maze/IA").transform);
 
             //Debug.Log($"Create New Ball ({i}) => DOT");
 
@@ -217,9 +228,12 @@ public class DOT : MonoBehaviour
             /* If the dot has just run out of steps to make, or it has actually reached the goal then calculate the fitness. */
             if (hitWall || isOnGoal)
             {
-                //Debug.Log($"Ball ({index}), dist = {distanceToGoal}, fitness = {1.0f / (distanceToGoal * distanceToGoal)} => DOT");
-                Debug.Log($"Ball ({index}), dist = {distanceToGoal}, fitness = {1.0f / distanceToGoal}");
-                return Brain.Fitness = /*(distanceToGoal */ 1.0f / (distanceToGoal*distanceToGoal) ;//);//+ (int)Mathf.Pow(Brain.step, 2));
+                //return Brain.Fitness = 1.0f / (distanceToGoal * distanceToGoal) + ((Brain.step / Brain.genesSize)*100);
+                //return Brain.Fitness = 1.0f / Mathf.Pow(distanceToGoal, 2) * Brain.step;
+                //return Brain.Fitness = 1.0f / Mathf.Pow(distanceToGoal ,2) + Mathf.Pow(2, Brain.step);
+                //return Brain.Fitness = 1.0f / ((distanceToGoal * distanceToGoal) / (int)Mathf.Pow(Brain.step, 2));
+                return Brain.Fitness = 1.0f / (distanceToGoal * distanceToGoal + (int)Mathf.Pow(Brain.step, 2));
+
             }
              /*If the dot has hit a wall or obstacle, then its fitness is calculated as a number
                effectively 0 in size. I can't remember why I didn't use fitness = 0, but there was

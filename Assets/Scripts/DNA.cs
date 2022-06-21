@@ -18,6 +18,7 @@ public class DNA : MonoBehaviour
     public Func<Vector2> getRandomGene;// Random gene
     public Func<float> fitnessFunction;// Function of the fitness
     public int step = 0;
+    public int genesSize;
 
     #endregion
 
@@ -41,6 +42,7 @@ public class DNA : MonoBehaviour
         this.random = random;
         this.getRandomGene = getRandomGene;
         this.fitnessFunction = fitnessFunction;
+        genesSize = size; 
 
         // Don't create genes every time, only when he his allowed to
         if (shouldInitGenes)
@@ -76,6 +78,7 @@ public class DNA : MonoBehaviour
 
         //Debug.Log("Mutate => DNA");
     }
+
 
     /// <summary>
     /// /* Generates random vectors for the directions array.These are unit vectors(mag.

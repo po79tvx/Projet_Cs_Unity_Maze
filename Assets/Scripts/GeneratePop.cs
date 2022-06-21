@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GeneratePop : MonoBehaviour
 {
@@ -16,6 +17,8 @@ public class GeneratePop : MonoBehaviour
     [SerializeField] private int elitism = 5;
     [SerializeField] private GameObject ball;
 
+    [SerializeField] public Text textElement;
+
     #endregion
 
     /// <summary>
@@ -30,6 +33,8 @@ public class GeneratePop : MonoBehaviour
     private Func<float> fitnessFunction;
     private Vector2[] directions;
     private Algorithm ga;
+    private Goal goal;
+
     private bool isEveryOneDead;
 
     private int numberOfLiving;
@@ -48,11 +53,10 @@ public class GeneratePop : MonoBehaviour
     {
         random = new System.Random();
 
-        GameObject maze = GameObject.Find("Maze/IA");
+        ga = new(PopulationSize, 1000, random, GetRandomGene, fitnessFunction, elitism, MutationRate, ball);// Create an instance of the algorithm
+        goal = new();
 
-        Vector2 ballLocation = new(maze.transform.position.x + -806, maze.transform.position.y + 328);
-
-        ga = new(PopulationSize, 200, random, GetRandomGene, fitnessFunction, elitism, MutationRate, Instantiate(ball, ballLocation, Quaternion.identity) as GameObject);// Create an instance of the algorithm
+        textElement.text = ga.textValue;
     }
 
     /// <summary>
@@ -115,6 +119,7 @@ public class GeneratePop : MonoBehaviour
         }catch (NullReferenceException) { }
 
 
+
        // Debug.Log(numberOfLiving);
 
         if (numberOfLiving == 0)
@@ -122,6 +127,9 @@ public class GeneratePop : MonoBehaviour
 
         if (isEveryOneDead)
             ga.NewGeneration(PopulationSize, true);
+
+        ga.ChangeText(null,null,numberOfLiving);
+        textElement.text = ga.textValue;
 
         /*
         Debug.Log("Update => Pop");

@@ -24,14 +24,21 @@ public class Move : MonoBehaviour
     private void FixedUpdate()
     {
         if (moveHorizontal > 0.1f || moveHorizontal < -0.1f)
-            rb.AddForce(new Vector2(moveHorizontal * movementSpeed, 0f), ForceMode2D.Impulse);
+        {
+            rb.rotation += movementSpeed;
+        }
+            //rb.AddForce(new Vector2(moveHorizontal * movementSpeed, 0f), ForceMode2D.Impulse);
 
         if (moveVertical > 0.1f || moveVertical < -0.1f)
-            rb.AddForce(new Vector2(0f, moveVertical * movementSpeed), ForceMode2D.Impulse);
+        {
+            rb.rotation -= movementSpeed;
+        }
+            //rb.AddForce(new Vector2(0f, moveVertical * movementSpeed), ForceMode2D.Impulse);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        /*
         Debug.Log("Hit detected !!!");
         Destroy(collision.gameObject);
         this.gameObject.SetActive(false);
@@ -39,5 +46,7 @@ public class Move : MonoBehaviour
         moveHorizontal = 0f;
         moveVertical = 0f;
         movementSpeed = 0f;
+
+        */
     }
 }

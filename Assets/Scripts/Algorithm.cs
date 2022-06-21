@@ -10,7 +10,7 @@ public class Algorithm
     # region Attributs
     public List<GameObject> Population { get; private set; }// List of population
 
-    public int Generation { get; private set; }// How many generations has past
+    public int Generation = 0;// How many generations has past
     public float BestFitness { get; private set; }// Fitness of the best individu
     public Vector2[] BestGenes { get; private set; }// Best genes
 
@@ -19,7 +19,7 @@ public class Algorithm
 
     private List<GameObject> newPopulation;// Create a new population
     private System.Random random;// Random number
-    private float fitnessSum;// Sum of the fitness
+    private float fitnessSum = 0f;// Sum of the fitness
     private int dotSize;// Size of DOT
     private Func<Vector2> getRandomGene;// Function to get a random gene
     private Func<float> fitnessFunction;// Function to get the fitness
@@ -27,6 +27,8 @@ public class Algorithm
     public Collonie tmpCollonie;
     private DOT tmpDot;
     private GameObject tmpBall;
+
+    public string textValue = "Génération : 0";
 
     public List<DOT> oldPopulation;
     #endregion
@@ -80,9 +82,9 @@ public class Algorithm
             oldPopulation.Add(tmpTest);
         }
 
-        Debug.Log($"Pop size : ({Population.Count}) = Algorithm (Constructor)");
+        //Debug.Log($"Pop size : ({Population.Count}) = Algorithm (Constructor)");
 
-        Debug.Log("New Algorithm => Algorithm (Constructor)");
+        //Debug.Log("New Algorithm => Algorithm (Constructor)");
     }
 
     #endregion
@@ -113,6 +115,8 @@ public class Algorithm
                 best = oldPopulation[i].Brain;
             }
         }
+
+        ChangeText();
     }
 
     /// <summary>
@@ -149,7 +153,7 @@ public class Algorithm
             // How many elements we want to keep & not more elements than the original population
             if (i < Elitism && i < oldPopulation.Count)
             {
-                tmpDot = oldPopulation[i];
+                tmpDot = ChooseParent();
 
                 tmpBall = tmpDot.CreateNewBall(i, Ball);
 
@@ -159,7 +163,7 @@ public class Algorithm
 
                 newPopulation.Add(tmpBall);
 
-                Debug.Log($"Elitism ({i}) => Algorithm");
+                //Debug.Log($"Elitism ({i}) => Algorithm");
 
                 //newPopulation.Add(oldPopulation[i]);
             }
@@ -191,7 +195,7 @@ public class Algorithm
 
                 newPopulation.Add(tmpBall);
 
-                Debug.Log($"Crossover ({i}) => Algorithm");
+                //Debug.Log($"Crossover ({i}) => Algorithm");
             }
             else
             {
@@ -209,7 +213,7 @@ public class Algorithm
 
                 newPopulation.Add(tmpBall);
 
-                Debug.Log($"New Ball ({i} => Algorithm");
+                //Debug.Log($"New Ball ({i} => Algorithm");
             }
         }
 
@@ -218,13 +222,32 @@ public class Algorithm
         Population = newPopulation;
         newPopulation = tmpList;
 
+        ChangeText();
         Generation++;// Increase the generation counter
+
+        // Destroy all the old DOT
+        foreach(GameObject oldObject in newPopulation)
+        {
+            UnityEngine.Object.Destroy(oldObject);
+        }
 
         /*
         Debug.Log($"New Generation {Generation} => Algorithm");
         Debug.Log($"Pop size : {Population.Count} => Algorithm");
         Debug.Log($"New pop size : {newPopulation.Count} => Algorithm");
         */
+    }
+
+    public void ChangeText(int? generation = null, float? fitness = null, int? population = null)
+    {
+        if (generation == null)
+            generation = Generation;
+        if (fitness == null)
+            fitness = fitnessSum;
+        if (population == null)
+            population = 0;
+
+        textValue = $"Génération : {generation} -- Fitness: {fitness} -- Population: {population}";
     }
 
     /// <summary>
