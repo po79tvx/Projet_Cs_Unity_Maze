@@ -13,6 +13,7 @@ The project has been created with [Visual Studio 2022](https://visualstudio.micr
 - `$ git clone https://github.com/po79tvx/Projet_Cs_Unity_Maze.git`
 - Or download directly the release
 - Make sure to watch the `Display 3` in Unity Editor and use size `Full HD (1920x1080)`
+- The unity file is inside [`Assets/Projet_Cs_Unity_Maze.unity`](Assets/Projet_Cs_Unity_Maze.unity)
 
 ## Various classes
 
@@ -28,5 +29,5 @@ The project has been created with [Visual Studio 2022](https://visualstudio.micr
 - Requirements specification (Made by me)[^1]
 - Logbook[^2]
 
-[^1]: Soon
-[^2]: Soon
+[^1]: It's on teams
+[^2]: It's on teams
