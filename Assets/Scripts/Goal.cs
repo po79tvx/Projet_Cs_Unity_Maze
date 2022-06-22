@@ -4,41 +4,52 @@ using UnityEngine;
 
 public class Goal : MonoBehaviour
 {
-    Vector2[] positions;
-    GameObject[] goals;
-    const int NUMBER_OF_GOALS = 11;
-
-    public GameObject goal;
+    private GameObject goalObject;
+    private bool isActive = false;
 
     // Start is called before the first frame update
     void Start()
-    {
-        positions = new Vector2[NUMBER_OF_GOALS] { new(-631, 10), new(-681, -340), new(-184, -172), 
-            new(-83, 161), new(-134, 364), new(186, 178), 
-            new(794, 351), new(650, -7), new(456, -273), 
-            new(667, -370), new(806, 433) };
+    { }
 
-        for (int i = 0; i < NUMBER_OF_GOALS; i++)
+    /// <summary>
+    /// Create a new ball
+    /// </summary>
+    /// <param name="i">Index in the array</param>
+    /// <param name="ball">The ball to create</param>
+    /// <returns></returns>
+    public GameObject CreateNewGoal(int i, GameObject goal, Vector2 position)
+    {
+        try
         {
+            //Vector2 ballLocation = new(maze.transform.position.x + -806, maze.transform.position.y + 328);
             GameObject mazeGoal = GameObject.Find("Maze/Goal");
 
-            GameObject tmpBall = Instantiate(goal, positions[i], Quaternion.identity, mazeGoal.transform);
+            GameObject tmpGoal = Instantiate(goal, new Vector2(mazeGoal.transform.position.x + position.x, mazeGoal.transform.position.y + position.y), Quaternion.identity, mazeGoal.transform);
 
-            tmpBall.name = "BallClone" + (i + 1);
+            tmpGoal.name = "Goal" + (i + 1);
 
-            //Debug.Log($"Create New Ball ({i}) => DOT");
+            goalObject = tmpGoal;
 
-            goal = tmpBall;
-
-            goals[i] = goal;
-
+            return tmpGoal;
         }
-        
+        catch (System.NullReferenceException)
+        {
+            return null;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        
+        if (collision == null || collision.gameObject.CompareTag("Goal"))
+            isActive = false;
+        else
+            isActive = true;
+
     }
+
+    public bool IsActive()
+    {
+        return isActive;
+    }
+
 }

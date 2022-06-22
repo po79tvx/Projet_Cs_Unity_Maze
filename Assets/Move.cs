@@ -25,15 +25,16 @@ public class Move : MonoBehaviour
     {
         if (moveHorizontal > 0.1f || moveHorizontal < -0.1f)
         {
-            rb.rotation += movementSpeed;
+            //rb.rotation += movementSpeed;
+            rb.AddForce(new Vector2(moveHorizontal * movementSpeed, 0f), ForceMode2D.Impulse);
         }
-            //rb.AddForce(new Vector2(moveHorizontal * movementSpeed, 0f), ForceMode2D.Impulse);
+
 
         if (moveVertical > 0.1f || moveVertical < -0.1f)
         {
-            rb.rotation -= movementSpeed;
+            //rb.rotation -= movementSpeed;
+            rb.AddForce(new Vector2(0f, moveVertical * movementSpeed), ForceMode2D.Impulse);
         }
-            //rb.AddForce(new Vector2(0f, moveVertical * movementSpeed), ForceMode2D.Impulse);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

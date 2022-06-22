@@ -24,7 +24,6 @@ public class Algorithm
     private Func<Vector2> getRandomGene;// Function to get a random gene
     private Func<float> fitnessFunction;// Function to get the fitness
     public GameObject Ball;
-    public Collonie tmpCollonie;
     private DOT tmpDot;
     private GameObject tmpBall;
 
@@ -81,10 +80,6 @@ public class Algorithm
 
             oldPopulation.Add(tmpTest);
         }
-
-        //Debug.Log($"Pop size : ({Population.Count}) = Algorithm (Constructor)");
-
-        //Debug.Log("New Algorithm => Algorithm (Constructor)");
     }
 
     #endregion
@@ -99,16 +94,12 @@ public class Algorithm
     /// </summary>
     private void CalculatePopulationFitness()
     {
-        // Debug.Log("Calculate Fitness => Algorithm");
-
         fitnessSum = 0;
         DNA best = oldPopulation[0].Brain;
 
         for (int i = 0; i < Population.Count; i++)
         {
             fitnessSum += oldPopulation[i].Brain.Fitness;
-
-            //fitnessSum += Population[i].GetComponent<DOT>().CalculateFitness();
 
             if (oldPopulation[i].Brain.Fitness > best.Fitness)
             {
@@ -127,29 +118,17 @@ public class Algorithm
     public void NewGeneration(int numNewDOT, bool crossoverNewDOT)
     {
         int finalCount = Population.Count + numNewDOT;
-        /*
-        Debug.Log($"Old Population ({oldPopulation.Count}) => Algorithm");
-
-        Debug.Log($"Start creation of new gen ({numNewDOT.ToString()}) => Algorithm");
-        Debug.Log($"Final count ({finalCount.ToString()}) => Algorithm");
-        */
-
+        
         // If the population is totally dead
         if (Population.Count > 0)
         {
-            //Debug.Log($"Population ({Population.Count.ToString()}) => Algorithm");
             CalculatePopulationFitness();
-            //Population.Sort();
         }
         newPopulation.Clear();// Clear the old list
-
-        //Debug.Log("Clear population => Algorithm");
 
         // Loop inside the population size
         for (int i = 0; i < oldPopulation.Count; i++)
         {
-           //Debug.Log($"For loop ({i.ToString()})=> Algorithm");
-
             // How many elements we want to keep & not more elements than the original population
             if (i < Elitism && i < oldPopulation.Count)
             {
@@ -162,10 +141,6 @@ public class Algorithm
                 tmpTest.DotInteractConstructor(tmpDot.Brain, this, i);
 
                 newPopulation.Add(tmpBall);
-
-                //Debug.Log($"Elitism ({i}) => Algorithm");
-
-                //newPopulation.Add(oldPopulation[i]);
             }
             else if (i < oldPopulation.Count || crossoverNewDOT)// Create new kids
             {
@@ -182,9 +157,6 @@ public class Algorithm
                 DOT newChild = new(child);
 
                 // Add the child to the population
-                /*newPopulation.Add(newChild.CreateNewBall(i, Ball));
-                */
-
                 tmpDot = newChild;
 
                 tmpBall = tmpDot.CreateNewBall(i, Ball);
@@ -194,15 +166,10 @@ public class Algorithm
                 tmpTest.DotInteractConstructor(newChild.Brain, this, i);
 
                 newPopulation.Add(tmpBall);
-
-                //Debug.Log($"Crossover ({i}) => Algorithm");
             }
             else
             {
                 // Replace the actual generation with an other generation
-
-                //Debug.Log("Create New Ball => Algoritm");
-
                 tmpDot = new(new(dotSize, random, getRandomGene, fitnessFunction, shouldInitGenes: true));
 
                 tmpBall = tmpDot.CreateNewBall(i, Ball);
@@ -212,8 +179,6 @@ public class Algorithm
                 tmpTest.DotInteractConstructor(tmpDot.Brain, this, i);
 
                 newPopulation.Add(tmpBall);
-
-                //Debug.Log($"New Ball ({i} => Algorithm");
             }
         }
 
@@ -230,14 +195,14 @@ public class Algorithm
         {
             UnityEngine.Object.Destroy(oldObject);
         }
-
-        /*
-        Debug.Log($"New Generation {Generation} => Algorithm");
-        Debug.Log($"Pop size : {Population.Count} => Algorithm");
-        Debug.Log($"New pop size : {newPopulation.Count} => Algorithm");
-        */
     }
 
+    /// <summary>
+    /// Change the text 
+    /// </summary>
+    /// <param name="generation">Generation number</param>
+    /// <param name="fitness">Fitness</param>
+    /// <param name="population">Population</param>
     public void ChangeText(int? generation = null, float? fitness = null, int? population = null)
     {
         if (generation == null)
@@ -271,7 +236,6 @@ public class Algorithm
                 child.Genes[i] = secondParent.Genes[i];
         }
 
-        //Debug.Log("Crossover => DNA");
 
         return child;
     }
@@ -294,8 +258,6 @@ public class Algorithm
 
             randomNumber -= oldPopulation[i].Brain.Fitness;
         }
-
-        //Debug.Log("Choose Parent => Algorithm");
 
         return null;
     }

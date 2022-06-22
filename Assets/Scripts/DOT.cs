@@ -3,7 +3,6 @@ using UnityEngine;
 /// <summary>
 /// Create a new dot
 /// </summary>
-/// <typeparam name="T">Any type of param</typeparam>
 public class DOT : MonoBehaviour
 {
     /// <summary>
@@ -15,11 +14,11 @@ public class DOT : MonoBehaviour
     public Vector2 pos = new (0f, 0f);// Position
     public Vector2 acc = new (1f, 1f);// Acceleration
 
-    [Range (0,50)]
+    //[Range (0,50)]
     public Vector2 vel = new(0f, 0f);// Velocity
 
     public bool hitWall;
-    private bool isOnGoal, isBest;
+    private bool isOnGoal;
     public float Fitness = 0.0f;
     public int index;
 
@@ -45,8 +44,6 @@ public class DOT : MonoBehaviour
         acc = new Vector2(1f, 1f);
 
         vel = new Vector2(0f, 0f);
-
-        //Debug.Log("New DOT => DOT");
     }
     #endregion
 
@@ -93,8 +90,6 @@ public class DOT : MonoBehaviour
          }
 
         // Add the acceleration to velocity
-        //vel -= new Vector2(acc.x, acc.y) * Time.deltaTime;
-
         rb.velocity -= new Vector2(acc.x, acc.y) * Time.deltaTime;
 
         // Update the position of the dot.
@@ -109,22 +104,14 @@ public class DOT : MonoBehaviour
     private void Update()
     {
         /* Only update if the dot is still moving. */
-        if (!isOnGoal && !hitWall)
+        if (!isOnGoal)
         {
-            MoveDot();
-            if (IsCollided())
+            if (!hitWall)
             {
-                CalculateFitness();
-            }
-            /* This checks to see if the dot has reached the goal. */
-            else if (Vector2.Distance(this.pos, GameObject.Find("Goal").transform.position) < 5)
-            {
-                isOnGoal = true;
-                CalculateFitness();
+                MoveDot();
+
             }
         }
-
-        // Debug.Log("Calculate Fitness => DNA");
     }
 
     /// <summary>
@@ -139,14 +126,6 @@ public class DOT : MonoBehaviour
         }
         else
         {
-            /*
-            gameObject.SetActive(false);
-
-            algo.oldPopulation.Add(this);
-
-            hitWall = true;
-            */
-
             algo.oldPopulation[index] = this;
 
             gameObject.SetActive(false);
@@ -167,9 +146,12 @@ public class DOT : MonoBehaviour
         {
             hitWall = true;
             CalculateFitness();
-            //Brain.Genes[Brain.step] = Brain.getRandomGene();
+            if (Vector2.Distance(pos, GameObject.Find("Goal").transform.position) < 5)
+            {
+                isOnGoal = true;
 
-            //Debug.Log($"Fitness de ({index}) == ({Brain.Fitness}) => DOT");
+                Brain.Fitness += 10000;
+            }
         }
     }
 
@@ -191,28 +173,16 @@ public class DOT : MonoBehaviour
             
             tmpBall.name = "BallClone" + (i + 1);
 
-            //Debug.Log($"Create New Ball ({i}) => DOT");
-
             ballObject = tmpBall;
 
             return tmpBall;
         }
         catch (System.NullReferenceException)
         {
-            //Debug.Log($"Create New Ball ({i}) [Error] => DOT");
-
             return null;
         }
     }
 
-    /// <summary>
-    /// Is the ball collided
-    /// </summary>
-    /// <returns>Is the ball collided ?</returns>
-    private bool IsCollided()
-    {
-        return hitWall;
-    }
 
     /// <summary>
     /// This is the fitness function for this algorithm. It uses the distance to the goal,
@@ -228,10 +198,6 @@ public class DOT : MonoBehaviour
             /* If the dot has just run out of steps to make, or it has actually reached the goal then calculate the fitness. */
             if (hitWall || isOnGoal)
             {
-                //return Brain.Fitness = 1.0f / (distanceToGoal * distanceToGoal) + ((Brain.step / Brain.genesSize)*100);
-                //return Brain.Fitness = 1.0f / Mathf.Pow(distanceToGoal, 2) * Brain.step;
-                //return Brain.Fitness = 1.0f / Mathf.Pow(distanceToGoal ,2) + Mathf.Pow(2, Brain.step);
-                //return Brain.Fitness = 1.0f / ((distanceToGoal * distanceToGoal) / (int)Mathf.Pow(Brain.step, 2));
                 return Brain.Fitness = 1.0f / (distanceToGoal * distanceToGoal + (int)Mathf.Pow(Brain.step, 2));
 
             }
@@ -243,9 +209,6 @@ public class DOT : MonoBehaviour
                 return Brain.Fitness = 0.00000000001f;
             }
         }
-
-        //Debug.Log($"Brain Fitness ({index}) --> ({Brain.Fitness})=> DOT");
-
         return Brain.Fitness = 0f;
     }
     #endregion
