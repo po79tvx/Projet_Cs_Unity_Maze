@@ -12,6 +12,7 @@ The project has been created with [Visual Studio 2022](https://visualstudio.micr
 
 - `$ git clone https://github.com/po79tvx/Projet_Cs_Unity_Maze.git`
 - Or download directly the release
+- Make sure to watch the `Display 3` in Unity Editor and use size `Full HD (1920x1080)`
 
 ## Various classes
 
@@ -22,45 +23,10 @@ The project has been created with [Visual Studio 2022](https://visualstudio.micr
 | [`DOT`](#DOT) | A member of the population |
 | [`DNA`](#DNA) | The brain of the dot |
 
-## Functions
-
-<a name="Population"></a>
-### Generate Pop
-| Name | Description |
-| --- | --- |
-| CalculatePopulationFitness() | Calculate the fitness of the population |
-| NewGeneration(int, bool) | Create a new generation of dot |
-| DNA Crossover(DNA, DNA) | Make a crossover between two parents |
-| DOT ChooseParent() | The brain of the dot |
-
-<a name="Algorithm"></a>
-### Algorithm 
-
-<!-- 
-Functions from Algorithm classe
--->
-
-<a name="DOT"></a>
-### DOT 
-
-<!-- 
-Functions from DOT classe
--->
-
-<a name="DNA"></a>
-### DOT 
-
-<!-- 
-Functions from DNA classe
--->
-
-
 ## Annexes
 
 - Requirements specification (Made by me)[^1]
 - Logbook[^2]
 
-
 [^1]: Soon
 [^2]: Soon
-
